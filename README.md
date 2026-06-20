@@ -26,7 +26,7 @@ The initial backend exposes a versioned API router with a health endpoint and fo
 
 ## Setup Instructions
 
-1. Copy environment variables:
+1. Copy environment variables at the repository root:
 
    ```bash
    cp .env.example .env
@@ -59,6 +59,8 @@ The initial backend exposes a versioned API router with a health endpoint and fo
    cd apps/api
    uvicorn app.main:app --reload
    ```
+
+   The API resolves configuration from the repository-root `.env` file, so the same local settings are used whether you start it from the repository root or from `apps/api`.
 
 ## Quality Checks
 
