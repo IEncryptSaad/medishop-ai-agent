@@ -1,6 +1,6 @@
 -- Create the knowledge chunk vector index after embedding backfill.
 --
--- Run this migration only after knowledge_chunks.embedding has been populated.
+-- Run this manual script only after knowledge_chunks.embedding has been populated.
 -- HNSW does not require training on existing rows and is preferred when the
 -- installed pgvector version supports it. Older pgvector versions may not expose
 -- the hnsw index access method, so IVFFlat is used as a documented fallback.
@@ -11,7 +11,7 @@ begin
     from public.knowledge_chunks
     where embedding is not null
   ) then
-    raise exception 'Create embeddings in public.knowledge_chunks before running this vector index migration.';
+    raise exception 'Create embeddings in public.knowledge_chunks before running this vector index script.';
   end if;
 
   if exists (select 1 from pg_catalog.pg_am where amname = 'hnsw') then
