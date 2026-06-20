@@ -22,7 +22,7 @@ class Settings(BaseSettings):
     api_port: int = Field(default=8000, validation_alias="API_PORT")
     llm_provider: str = Field(default="mock", validation_alias="LLM_PROVIDER")
     api_cors_origins: list[AnyHttpUrl] = Field(
-        default_factory=list, validation_alias="API_CORS_ORIGINS"
+        default_factory=lambda: ["http://localhost:3000"], validation_alias="API_CORS_ORIGINS"
     )
 
     @field_validator("api_cors_origins", mode="before")
