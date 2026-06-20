@@ -1,0 +1,10 @@
+-- This migration version is intentionally kept as a no-op.
+--
+-- Earlier deployments may have already applied migration 002 when it created
+-- ix_knowledge_chunks_embedding after an embedding backfill. Keeping this file
+-- preserves Supabase migration history alignment for those projects while the
+-- actual vector index creation has moved to the manual post-backfill script at:
+--   supabase/scripts/create_vector_index_after_backfill.sql
+--
+-- Run that script manually only after public.knowledge_chunks.embedding contains
+-- non-null values.
