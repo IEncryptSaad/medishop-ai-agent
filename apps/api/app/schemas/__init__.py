@@ -1,1 +1,47 @@
-"""schemas package."""
+"""Pydantic schemas for MediShop AI Agent entities."""
+
+from app.schemas.entities import (
+    AgentRunCreate,
+    AgentRunRead,
+    AppointmentCreate,
+    AppointmentRead,
+    ConversationCreate,
+    ConversationRead,
+    KnowledgeChunkCreate,
+    KnowledgeChunkRead,
+    KnowledgeDocumentCreate,
+    KnowledgeDocumentRead,
+    MessageCreate,
+    MessageRead,
+    ProductCategoryCreate,
+    ProductCategoryRead,
+    ProductCreate,
+    ProductRead,
+    SupportTicketCreate,
+    SupportTicketRead,
+    UserCreate,
+    UserRead,
+)
+
+__all__ = [
+    "AgentRunCreate",
+    "AgentRunRead",
+    "AppointmentCreate",
+    "AppointmentRead",
+    "ConversationCreate",
+    "ConversationRead",
+    "KnowledgeChunkCreate",
+    "KnowledgeChunkRead",
+    "KnowledgeDocumentCreate",
+    "KnowledgeDocumentRead",
+    "MessageCreate",
+    "MessageRead",
+    "ProductCategoryCreate",
+    "ProductCategoryRead",
+    "ProductCreate",
+    "ProductRead",
+    "SupportTicketCreate",
+    "SupportTicketRead",
+    "UserCreate",
+    "UserRead",
+]
