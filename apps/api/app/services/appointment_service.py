@@ -21,12 +21,6 @@ class AppointmentService:
         self.repository = repository
 
     def create(self, payload: AppointmentCreateRequest):
-        if payload.scheduled_end <= payload.scheduled_start:
-            raise AppError(
-                "scheduled_end must be after scheduled_start.",
-                status.HTTP_422_UNPROCESSABLE_ENTITY,
-                error="validation_error",
-            )
         return self.repository.create(payload)
 
     def list(self, params: AppointmentListRequest) -> AppointmentListResponse:
@@ -51,6 +45,26 @@ class AppointmentService:
         return item
 
     def update(self, appointment_id: UUID, payload: AppointmentUpdateRequest):
+        current = self.repository.get(appointment_id)
+        if current is None:
+            raise AppError("Appointment not found.", status.HTTP_404_NOT_FOUND, error="not_found")
+
+        updates = payload.model_dump(exclude_unset=True)
+        scheduled_start = updates.get("scheduled_start", current.scheduled_start)
+        scheduled_end = updates.get("scheduled_end", current.scheduled_end)
+        if scheduled_end <= scheduled_start:
+            raise AppError(
+                "scheduled_end must be after scheduled_start.",
+                status.HTTP_422_UNPROCESSABLE_ENTITY,
+                error="validation_error",
+                details=[
+                    {
+                        "field": "body.scheduled_end",
+                        "message": "scheduled_end must be after scheduled_start.",
+                    }
+                ],
+            )
+
         item = self.repository.update(appointment_id, payload)
         if item is None:
             raise AppError("Appointment not found.", status.HTTP_404_NOT_FOUND, error="not_found")
