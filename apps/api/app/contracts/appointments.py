@@ -43,7 +43,9 @@ class AppointmentResponse(TimestampedResource):
     scheduled_end: datetime
     status: str
     notes: str | None = None
-    metadata: dict[str, Any] = Field(default_factory=dict)
+    metadata: dict[str, Any] = Field(
+        default_factory=dict, validation_alias="metadata_json", serialization_alias="metadata"
+    )
 
 
 class AppointmentListResponse(PaginatedResponse[AppointmentResponse]):
