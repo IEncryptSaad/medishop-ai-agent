@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "FastAPI backend for the MediShop AI Agent MVP."
 requires-python = ">=3.11"
 dependencies = [
+  "email-validator>=2.2.0",
   "fastapi>=0.115.0",
   "pydantic-settings>=2.7.0",
   "python-json-logger>=3.2.1",
