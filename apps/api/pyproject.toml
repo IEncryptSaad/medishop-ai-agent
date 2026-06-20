@@ -1,0 +1,22 @@
+[project]
+name = "medishop-api"
+version = "0.1.0"
+description = "FastAPI backend for the MediShop AI Agent MVP."
+requires-python = ">=3.11"
+dependencies = [
+  "fastapi>=0.115.0",
+  "pydantic-settings>=2.7.0",
+  "python-json-logger>=3.2.1",
+  "uvicorn[standard]>=0.34.0"
+]
+
+[project.optional-dependencies]
+dev = ["ruff>=0.8.4"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["app"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]

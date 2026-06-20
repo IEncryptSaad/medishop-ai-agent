@@ -1,0 +1,16 @@
+{
+  "name": "medishop-ai-agent",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Production-grade AI Agent MVP foundation for Shopify medical stores.",
+  "packageManager": "pnpm@9.15.0",
+  "scripts": {
+    "lint": "pnpm --filter @medishop/web lint",
+    "build": "pnpm --filter @medishop/web build",
+    "format": "prettier --check .",
+    "format:write": "prettier --write ."
+  },
+  "devDependencies": {
+    "prettier": "^3.4.2"
+  }
+}
