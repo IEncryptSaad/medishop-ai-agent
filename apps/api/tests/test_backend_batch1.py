@@ -83,3 +83,70 @@ def test_agent_chat_medical_faq_disclaimer() -> None:
     text = response.json()["data"]["response"].lower()
     assert "not a diagnosis" in text
     assert "healthcare professional" in text
+
+
+def _create_appointment_for_validation() -> str:
+    response = client.post(
+        "/api/v1/appointments",
+        json={
+            "appointment_type": "pharmacist_consultation",
+            "scheduled_start": "2026-06-22T15:00:00Z",
+            "scheduled_end": "2026-06-22T15:30:00Z",
+        },
+    )
+    assert response.status_code == 201
+    return response.json()["data"]["id"]
+
+
+def test_appointment_creation_mixed_timezone_awareness_returns_validation_error() -> None:
+    response = client.post(
+        "/api/v1/appointments",
+        json={
+            "appointment_type": "pharmacist_consultation",
+            "scheduled_start": "2026-06-21T15:00:00+02:00",
+            "scheduled_end": "2026-06-21T13:00:00",
+        },
+    )
+    assert response.status_code == 422
+    body = response.json()
+    assert body["success"] is False
+    assert body["error"] == "validation_error"
+
+
+def test_appointment_patch_scheduled_end_before_existing_start_is_rejected() -> None:
+    appointment_id = _create_appointment_for_validation()
+
+    response = client.patch(
+        f"/api/v1/appointments/{appointment_id}",
+        json={"scheduled_end": "2026-06-22T14:59:00Z"},
+    )
+
+    assert response.status_code == 422
+    body = response.json()
+    assert body["success"] is False
+    assert body["error"] == "validation_error"
+
+
+def test_appointment_patch_scheduled_start_after_existing_end_is_rejected() -> None:
+    appointment_id = _create_appointment_for_validation()
+
+    response = client.patch(
+        f"/api/v1/appointments/{appointment_id}",
+        json={"scheduled_start": "2026-06-22T15:31:00Z"},
+    )
+
+    assert response.status_code == 422
+    body = response.json()
+    assert body["success"] is False
+    assert body["error"] == "validation_error"
+
+
+def test_appointment_patch_explicit_null_for_required_fields_is_rejected() -> None:
+    appointment_id = _create_appointment_for_validation()
+
+    for field in ("scheduled_start", "scheduled_end", "status", "metadata"):
+        response = client.patch(f"/api/v1/appointments/{appointment_id}", json={field: None})
+        assert response.status_code == 422
+        body = response.json()
+        assert body["success"] is False
+        assert body["error"] == "validation_error"
