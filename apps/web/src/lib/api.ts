@@ -20,6 +20,7 @@ export type SupportTicket = { id: string; subject: string; description: string; 
 
 type Envelope<T> = { data: T };
 type Page<T> = { items: T[]; total: number; page: number; page_size: number };
+type ApiProduct = Omit<Product, "price"> & { price: number | string };
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") || "";
 
@@ -48,12 +49,13 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 const page = <T>(items: T[]): Page<T> => ({ items, total: items.length, page: 1, page_size: items.length });
+const normalizeProduct = (product: ApiProduct): Product => ({ ...product, price: Number(product.price) });
 
 export const api = {
   async listProducts(query = "", category = "All"): Promise<Product[]> {
     try {
-      const payload = query ? await request<Envelope<Page<Product>>>("/api/v1/products/search", { method: "POST", body: JSON.stringify({ query, in_stock_only: false }) }) : await request<Envelope<Page<Product>>>("/api/v1/products");
-      return payload.data.items;
+      const payload = query ? await request<Envelope<Page<ApiProduct>>>("/api/v1/products/search", { method: "POST", body: JSON.stringify({ query, in_stock_only: false }) }) : await request<Envelope<Page<ApiProduct>>>("/api/v1/products");
+      return payload.data.items.map(normalizeProduct);
     } catch {
       return mockProducts.filter((p) => `${p.name} ${p.description}`.toLowerCase().includes(query.toLowerCase())).filter((p) => category === "All" || p.attributes.category === category);
     }
