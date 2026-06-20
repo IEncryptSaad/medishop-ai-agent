@@ -1,13 +1,19 @@
 from functools import lru_cache
+from pathlib import Path
 
 from pydantic import AnyHttpUrl, Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+REPO_ROOT = Path(__file__).resolve().parents[4]
+ROOT_ENV_FILE = REPO_ROOT / ".env"
 
 
 class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
 
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
+    model_config = SettingsConfigDict(
+        env_file=ROOT_ENV_FILE, env_file_encoding="utf-8", extra="ignore"
+    )
 
     app_name: str = "MediShop AI Agent API"
     app_env: str = Field(default="development", validation_alias="APP_ENV")

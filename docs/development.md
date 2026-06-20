@@ -8,7 +8,7 @@
 
 ## Local Environment
 
-Copy `.env.example` to `.env` and update values for your local environment.
+Copy the repository-root `.env.example` to a repository-root `.env` and update values for your local environment. The API resolves this root `.env` from its config module path, so local settings are consistent whether commands are run from the repository root or from `apps/api`.
 
 ## Frontend
 
