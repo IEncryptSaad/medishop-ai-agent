@@ -54,7 +54,7 @@ type ErrorEnvelope = {
   message?: string;
   details?: Array<{ field?: string; message?: string }>;
 };
-type RawProduct = Omit<Product, "price"> & { price: number | string };
+type RawProduct = Omit<Product, "price"> & { price: unknown };
 
 type Page<T> = {
   items: T[];
@@ -183,10 +183,10 @@ let mockTickets: SupportTicket[] = [
 
 const NUMERIC_PRICE_PATTERN = /^(?:\d+|\d+\.\d+|\.\d+)$/;
 
-export function normalizeProductPrice(price: number | string): number {
+export function normalizeProductPrice(price: unknown): number {
   if (typeof price === "number") {
     if (Number.isFinite(price)) return price;
-  } else if (NUMERIC_PRICE_PATTERN.test(price)) {
+  } else if (typeof price === "string" && NUMERIC_PRICE_PATTERN.test(price)) {
     const normalized = Number(price);
     if (Number.isFinite(normalized)) return normalized;
   }

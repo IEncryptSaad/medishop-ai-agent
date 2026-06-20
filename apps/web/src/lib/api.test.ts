@@ -22,6 +22,19 @@ test("normalizeProductPrice rejects malformed strings instead of truncating", ()
   }
 });
 
+test("normalizeProductPrice rejects non-string and non-number payloads", () => {
+  for (const price of [
+    ["24.99"],
+    { value: "24.99" },
+    true,
+    false,
+    null,
+    undefined,
+  ]) {
+    assert.throws(() => normalizeProductPrice(price), ApiError);
+  }
+});
+
 test("listProducts rejects API products with invalid prices", async () => {
   globalThis.fetch = async () =>
     new Response(
