@@ -3,11 +3,18 @@ from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.api.router import api_router
 from app.core.config import get_settings
-from app.core.errors import AppError, app_error_handler
+from app.core.errors import (
+    AppError,
+    app_error_handler,
+    http_error_handler,
+    validation_error_handler,
+)
 from app.core.logging import configure_logging
 
 settings = get_settings()
@@ -32,6 +39,8 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
     app.add_exception_handler(AppError, app_error_handler)
+    app.add_exception_handler(RequestValidationError, validation_error_handler)
+    app.add_exception_handler(StarletteHTTPException, http_error_handler)
     app.include_router(api_router)
     return app
 
