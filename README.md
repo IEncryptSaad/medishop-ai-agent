@@ -47,22 +47,43 @@ The backend exposes versioned API routes for health, mock product catalog search
    pip install -e ".[dev]"
    ```
 
-4. Run the web app:
-
-   ```bash
-   pnpm --filter @medishop/web dev
-   ```
-
-   The frontend reads `NEXT_PUBLIC_API_URL` for API calls, for example `NEXT_PUBLIC_API_URL=http://localhost:8000`. If the variable is omitted or the API is unavailable, the demo UI falls back to local mock catalog, appointment, support, and chat data so the MVP remains demo-ready without paid services.
-
-5. Run the API:
+4. Run the API:
 
    ```bash
    cd apps/api
    uvicorn app.main:app --reload
    ```
 
-   The API resolves configuration from the repository-root `.env` file, so the same local settings are used whether you start it from the repository root or from `apps/api`. `LLM_PROVIDER` defaults to `mock`, and local product, appointment, support, conversation, and knowledge data do not require a Supabase connection.
+   The backend runs at `http://localhost:8000` by default and exposes `/api/v1/health`, `/api/v1/products`, `/api/v1/products/search`, `/api/v1/appointments`, `/api/v1/support/tickets`, and `/api/v1/agent/chat`. The API resolves configuration from the repository-root `.env` file, so the same local settings are used whether you start it from the repository root or from `apps/api`. `LLM_PROVIDER` defaults to `mock`, and local product, appointment, support, conversation, and knowledge data do not require a Supabase connection.
+
+5. Run the web app in another terminal:
+
+   ```bash
+   NEXT_PUBLIC_API_URL=http://localhost:8000 pnpm --filter @medishop/web dev
+   ```
+
+   `NEXT_PUBLIC_API_URL` is optional in local development because the frontend defaults to `http://localhost:8000`. If the backend cannot be reached, the demo UI falls back to local mock catalog, appointment, support, and chat data so the MVP remains demo-ready without paid services. Validation and API errors from the backend are displayed as user-friendly messages in the UI.
+
+## Environment Variables
+
+| Variable              | Default                 | Used by  | Description                                        |
+| --------------------- | ----------------------- | -------- | -------------------------------------------------- |
+| `NEXT_PUBLIC_API_URL` | `http://localhost:8000` | Frontend | Base URL for the FastAPI backend.                  |
+| `API_CORS_ORIGINS`    | `http://localhost:3000` | Backend  | Comma-separated frontend origins allowed by CORS.  |
+| `API_HOST`            | `0.0.0.0`               | Backend  | API bind host.                                     |
+| `API_PORT`            | `8000`                  | Backend  | API bind port.                                     |
+| `LLM_PROVIDER`        | `mock`                  | Backend  | Keeps local chat responses free and deterministic. |
+
+## Local Full-Stack Test Steps
+
+1. Start the backend with `cd apps/api && uvicorn app.main:app --reload`.
+2. Verify health with `curl http://localhost:8000/api/v1/health`.
+3. Start the frontend with `NEXT_PUBLIC_API_URL=http://localhost:8000 pnpm --filter @medishop/web dev`.
+4. Open `http://localhost:3000/products` and search for `moisturizer`.
+5. Open `http://localhost:3000/chat` and ask a product question such as `Which moisturizer is good for sensitive skin?`.
+6. Open `http://localhost:3000/appointments` and create a booking.
+7. Open `http://localhost:3000/support` and create a ticket.
+8. Open `http://localhost:3000/dashboard` and confirm products, appointments, and tickets are loaded from the API.
 
 ## Quality Checks
 

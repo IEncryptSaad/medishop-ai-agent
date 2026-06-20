@@ -1,11 +1,147 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
-import { api, Product } from "@/lib/api";
+import { ApiError, api, Product } from "@/lib/api";
 import { Badge, Card, EmptyState } from "@/components/ui/card";
 
 export function ProductBrowser() {
-  const [products, setProducts] = useState<Product[]>([]); const [query, setQuery] = useState(""); const [category, setCategory] = useState("All"); const [selected, setSelected] = useState<Product | null>(null); const [loading, setLoading] = useState(true);
-  const categories = useMemo(() => ["All", ...Array.from(new Set(products.map((p) => String(p.attributes.category ?? "General"))))], [products]);
-  useEffect(() => { setLoading(true); api.listProducts(query, category).then(setProducts).finally(() => setLoading(false)); }, [query, category]);
-  return <div className="space-y-6"><div className="flex flex-col gap-3 md:flex-row"><input className="w-full rounded-2xl border px-4 py-3" placeholder="Search products..." value={query} onChange={(e)=>setQuery(e.target.value)} /><select className="rounded-2xl border px-4 py-3" value={category} onChange={(e)=>setCategory(e.target.value)}>{categories.map(c=><option key={c}>{c}</option>)}</select></div>{loading ? <EmptyState title="Loading products" description="Fetching catalog data..." /> : products.length === 0 ? <EmptyState title="No products found" description="Try a different search or category." /> : <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">{products.map(p=><Card key={p.id} className="flex flex-col gap-4"><div className="flex items-start justify-between gap-3"><div><p className="text-xs font-semibold text-brand-700">{p.sku}</p><h3 className="mt-1 text-lg font-bold">{p.name}</h3></div><Badge tone={p.stock_quantity > 20 ? "green" : "amber"}>{p.stock_quantity} in stock</Badge></div><p className="line-clamp-3 text-sm text-slate-600">{p.description}</p><div className="mt-auto flex items-center justify-between"><span className="text-2xl font-bold">${p.price.toFixed(2)}</span><button onClick={()=>setSelected(p)} className="rounded-full bg-brand-600 px-4 py-2 text-sm font-semibold text-white">Details</button></div></Card>)}</div>}{selected && <div className="fixed inset-0 z-30 grid place-items-center bg-slate-950/40 p-4" onClick={()=>setSelected(null)}><Card className="max-w-xl" onClick={(e)=>e.stopPropagation()}><div className="flex justify-between gap-6"><h2 className="text-2xl font-bold">{selected.name}</h2><button onClick={()=>setSelected(null)} className="text-slate-500">Close</button></div><p className="mt-3 text-slate-600">{selected.description}</p><dl className="mt-6 grid grid-cols-2 gap-4 text-sm"><div><dt className="text-slate-500">SKU</dt><dd className="font-semibold">{selected.sku}</dd></div><div><dt className="text-slate-500">Price</dt><dd className="font-semibold">${selected.price.toFixed(2)}</dd></div><div><dt className="text-slate-500">Category</dt><dd className="font-semibold">{String(selected.attributes.category ?? "General")}</dd></div><div><dt className="text-slate-500">Status</dt><dd className="font-semibold">{selected.status}</dd></div></dl></Card></div>}</div>;
+  const [products, setProducts] = useState<Product[]>([]);
+  const [query, setQuery] = useState("");
+  const [category, setCategory] = useState("All");
+  const [selected, setSelected] = useState<Product | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const categories = useMemo(
+    () => [
+      "All",
+      ...Array.from(
+        new Set(
+          products.map((p) => String(p.attributes.category ?? "General")),
+        ),
+      ),
+    ],
+    [products],
+  );
+  useEffect(() => {
+    setLoading(true);
+    setError(null);
+    api
+      .listProducts(query, category)
+      .then(setProducts)
+      .catch((err) =>
+        setError(
+          err instanceof ApiError
+            ? err.userMessage
+            : "Products could not be loaded. Please try again.",
+        ),
+      )
+      .finally(() => setLoading(false));
+  }, [query, category]);
+  return (
+    <div className="space-y-6">
+      {error && (
+        <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {error}
+        </div>
+      )}
+      <div className="flex flex-col gap-3 md:flex-row">
+        <input
+          className="w-full rounded-2xl border px-4 py-3"
+          placeholder="Search products..."
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+        />
+        <select
+          className="rounded-2xl border px-4 py-3"
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+        >
+          {categories.map((c) => (
+            <option key={c}>{c}</option>
+          ))}
+        </select>
+      </div>
+      {loading ? (
+        <EmptyState
+          title="Loading products"
+          description="Fetching catalog data..."
+        />
+      ) : products.length === 0 ? (
+        <EmptyState
+          title="No products found"
+          description="Try a different search or category."
+        />
+      ) : (
+        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+          {products.map((p) => (
+            <Card key={p.id} className="flex flex-col gap-4">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-xs font-semibold text-brand-700">
+                    {p.sku}
+                  </p>
+                  <h3 className="mt-1 text-lg font-bold">{p.name}</h3>
+                </div>
+                <Badge tone={p.stock_quantity > 20 ? "green" : "amber"}>
+                  {p.stock_quantity} in stock
+                </Badge>
+              </div>
+              <p className="line-clamp-3 text-sm text-slate-600">
+                {p.description}
+              </p>
+              <div className="mt-auto flex items-center justify-between">
+                <span className="text-2xl font-bold">
+                  ${p.price.toFixed(2)}
+                </span>
+                <button
+                  onClick={() => setSelected(p)}
+                  className="rounded-full bg-brand-600 px-4 py-2 text-sm font-semibold text-white"
+                >
+                  Details
+                </button>
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
+      {selected && (
+        <div
+          className="fixed inset-0 z-30 grid place-items-center bg-slate-950/40 p-4"
+          onClick={() => setSelected(null)}
+        >
+          <Card className="max-w-xl" onClick={(e) => e.stopPropagation()}>
+            <div className="flex justify-between gap-6">
+              <h2 className="text-2xl font-bold">{selected.name}</h2>
+              <button
+                onClick={() => setSelected(null)}
+                className="text-slate-500"
+              >
+                Close
+              </button>
+            </div>
+            <p className="mt-3 text-slate-600">{selected.description}</p>
+            <dl className="mt-6 grid grid-cols-2 gap-4 text-sm">
+              <div>
+                <dt className="text-slate-500">SKU</dt>
+                <dd className="font-semibold">{selected.sku}</dd>
+              </div>
+              <div>
+                <dt className="text-slate-500">Price</dt>
+                <dd className="font-semibold">${selected.price.toFixed(2)}</dd>
+              </div>
+              <div>
+                <dt className="text-slate-500">Category</dt>
+                <dd className="font-semibold">
+                  {String(selected.attributes.category ?? "General")}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-slate-500">Status</dt>
+                <dd className="font-semibold">{selected.status}</dd>
+              </div>
+            </dl>
+          </Card>
+        </div>
+      )}
+    </div>
+  );
 }
