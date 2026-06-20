@@ -46,7 +46,9 @@ class SupportTicketResponse(TimestampedResource):
     status: str
     priority: str
     category: str | None = None
-    metadata: dict[str, Any] = Field(default_factory=dict)
+    metadata: dict[str, Any] = Field(
+        default_factory=dict, validation_alias="metadata_json", serialization_alias="metadata"
+    )
 
 
 class SupportTicketListResponse(PaginatedResponse[SupportTicketResponse]):

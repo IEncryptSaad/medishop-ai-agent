@@ -4,7 +4,7 @@ All v1 endpoints return a consistent JSON envelope. Successful responses use `su
 
 ## Authentication Strategy
 
-- Public endpoints: `GET /health`, `POST /api/v1/auth/register`, `POST /api/v1/auth/login`, and `POST /api/v1/auth/refresh`.
+- Public endpoints: `GET /api/v1/health`, `POST /api/v1/auth/register`, `POST /api/v1/auth/login`, and `POST /api/v1/auth/refresh`.
 - Protected endpoints: all agent, product, appointment, support, and current-user endpoints unless explicitly opened later.
 - Clients authenticate with `Authorization: Bearer <access_token>`.
 - Access tokens should be short-lived JWTs. Refresh tokens should be opaque or signed, stored securely by the client, and rotated on refresh.
@@ -59,7 +59,7 @@ Common error codes: `validation_error`, `unauthorized`, `forbidden`, `not_found`
 
 ## Health
 
-### `GET /health`
+### `GET /api/v1/health`
 
 Response example:
 
