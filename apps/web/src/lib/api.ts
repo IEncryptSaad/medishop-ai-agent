@@ -54,6 +54,8 @@ type ErrorEnvelope = {
   message?: string;
   details?: Array<{ field?: string; message?: string }>;
 };
+type RawProduct = Omit<Product, "price"> & { price: number | string };
+
 type Page<T> = {
   items: T[];
   total?: number;
@@ -179,8 +181,21 @@ let mockTickets: SupportTicket[] = [
   },
 ];
 
-function normalizeProduct(product: Product): Product {
-  return { ...product, price: Number(product.price) };
+const NUMERIC_PRICE_PATTERN = /^(?:\d+|\d+\.\d+|\.\d+)$/;
+
+export function normalizeProductPrice(price: number | string): number {
+  if (typeof price === "number") {
+    if (Number.isFinite(price)) return price;
+  } else if (NUMERIC_PRICE_PATTERN.test(price)) {
+    const normalized = Number(price);
+    if (Number.isFinite(normalized)) return normalized;
+  }
+
+  throw new ApiError("API returned an invalid product price.");
+}
+
+function normalizeProduct(product: RawProduct): Product {
+  return { ...product, price: normalizeProductPrice(product.price) };
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
@@ -244,11 +259,11 @@ export const api = {
   async listProducts(query = "", category = "All"): Promise<Product[]> {
     try {
       const payload = query
-        ? await request<Envelope<Page<Product>>>("/api/v1/products/search", {
+        ? await request<Envelope<Page<RawProduct>>>("/api/v1/products/search", {
             method: "POST",
             body: JSON.stringify({ query, in_stock_only: false }),
           })
-        : await request<Envelope<Page<Product>>>("/api/v1/products");
+        : await request<Envelope<Page<RawProduct>>>("/api/v1/products");
       return payload.data.items
         .map(normalizeProduct)
         .filter(

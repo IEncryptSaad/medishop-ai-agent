@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "lint": "next lint",
-    "start": "next start"
+    "start": "next start",
+    "test": "node --import tsx --test src/lib/api.test.ts"
   },
   "dependencies": {
     "@medishop/shared": "workspace:*",
@@ -23,6 +24,7 @@
     "eslint-config-next": "14.2.23",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.17",
+    "tsx": "^4.20.0",
     "typescript": "^5.7.3"
   }
 }
