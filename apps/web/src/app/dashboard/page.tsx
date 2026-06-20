@@ -1,10 +1,3 @@
 import { AppShell } from "@/components/app-shell";
-import { PlaceholderPage } from "@/components/placeholder-page";
-
-export default function DashboardPage() {
-  return (
-    <AppShell>
-      <PlaceholderPage title="Dashboard" description="Placeholder workspace for future dashboard capabilities." />
-    </AppShell>
-  );
-}
+import { DashboardPanel } from "@/components/features/dashboard-panel";
+export default function DashboardPage(){return <AppShell><div className="mb-8"><p className="font-semibold text-brand-700">Overview</p><h1 className="text-4xl font-bold">Dashboard</h1><p className="mt-3 max-w-2xl text-slate-600">Snapshot of catalog coverage, conversations, bookings, support volume, and recent activity.</p></div><DashboardPanel /></AppShell>}

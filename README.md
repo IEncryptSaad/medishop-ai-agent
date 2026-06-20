@@ -53,6 +53,8 @@ The backend exposes versioned API routes for health, mock product catalog search
    pnpm --filter @medishop/web dev
    ```
 
+   The frontend reads `NEXT_PUBLIC_API_URL` for API calls, for example `NEXT_PUBLIC_API_URL=http://localhost:8000`. If the variable is omitted or the API is unavailable, the demo UI falls back to local mock catalog, appointment, support, and chat data so the MVP remains demo-ready without paid services.
+
 5. Run the API:
 
    ```bash
@@ -70,6 +72,10 @@ pnpm --filter @medishop/web build
 cd apps/api && ruff check app tests
 cd apps/api && pytest
 ```
+
+## Frontend MVP
+
+The Next.js app includes demo-ready routes for `/`, `/chat`, `/products`, `/appointments`, `/support`, and `/dashboard`. The UI provides a responsive healthcare SaaS shell, reusable cards and badges, product search and detail views, safe chat with source and recommendation cards, booking and ticket forms, loading/empty/error-friendly states, and dashboard metrics.
 
 ## Current Scope
 
