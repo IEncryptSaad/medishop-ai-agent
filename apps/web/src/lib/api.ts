@@ -49,7 +49,13 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 const page = <T>(items: T[]): Page<T> => ({ items, total: items.length, page: 1, page_size: items.length });
-const normalizeProduct = (product: ApiProduct): Product => ({ ...product, price: Number(product.price) });
+const parseProductPrice = (price: ApiProduct["price"]): number => {
+  const normalizedPrice = typeof price === "number" ? price : Number.parseFloat(price);
+  if (!Number.isFinite(normalizedPrice)) throw new Error("Invalid product price from API");
+  return normalizedPrice;
+};
+
+const normalizeProduct = (product: ApiProduct): Product => ({ ...product, price: parseProductPrice(product.price) });
 
 export const api = {
   async listProducts(query = "", category = "All"): Promise<Product[]> {
