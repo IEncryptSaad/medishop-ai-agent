@@ -13,7 +13,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=8.3.0", "ruff>=0.8.4"]
+dev = ["httpx2>=0.28.0", "pytest>=8.3.0", "ruff>=0.8.4"]
 
 [tool.ruff]
 line-length = 100
@@ -22,3 +22,6 @@ src = ["app", "tests"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]

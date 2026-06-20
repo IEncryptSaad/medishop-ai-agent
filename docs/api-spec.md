@@ -248,9 +248,9 @@ Response example:
 }
 ```
 
-### `GET /api/v1/products/{id}`
+### `GET /api/v1/products/{product_id}`
 
-Response: a single product in `ProductEnvelope`.
+Response: a single product in `ProductEnvelope`. Returns `not_found` when the mock catalog does not contain the product.
 
 ### `POST /api/v1/products/search`
 
@@ -287,7 +287,7 @@ Request example:
 }
 ```
 
-Response: created appointment in `AppointmentEnvelope`.
+Response: created appointment in `AppointmentEnvelope` with `status: scheduled`. The local backend stores appointments in an in-memory repository until Supabase wiring is enabled.
 
 ### `GET /api/v1/appointments`
 
@@ -327,7 +327,7 @@ Request example:
 }
 ```
 
-Response: created support ticket in `SupportTicketEnvelope`.
+Response: created support ticket in `SupportTicketEnvelope` with `status: open`. The local backend stores support tickets in an in-memory repository until Supabase wiring is enabled.
 
 ### `GET /api/v1/support/tickets`
 
@@ -348,3 +348,10 @@ Request example:
 ```
 
 Response: updated support ticket in `SupportTicketEnvelope`.
+
+## Local Backend Batch 1 Notes
+
+- Product, appointment, support, conversation, and knowledge access use modular repositories with seeded mock/in-memory data.
+- `POST /api/v1/agent/chat` uses the default mock LLM provider and does not call paid APIs. It classifies intents as `product_question`, `appointment_booking`, `support_request`, `medical_faq`, or `general`; product and FAQ matches can be returned as sources and recommendations.
+- Medical FAQ responses include a disclaimer and recommend professional escalation for diagnosis, medication, or emergency symptoms.
+- Validation, not-found, and application errors use the shared structured error response envelope.

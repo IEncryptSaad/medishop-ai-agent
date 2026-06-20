@@ -15,7 +15,7 @@ docs/           Architecture, deployment, and development guides
 .github/        CI workflows
 ```
 
-The initial backend exposes a versioned API router with a health endpoint and foundational cross-cutting concerns: configuration management, environment variable validation, structured logging, CORS, and application error handling.
+The backend exposes versioned API routes for health, mock product catalog search, in-memory appointment booking, support tickets, and a safe mock agent chat flow. Foundational cross-cutting concerns include configuration management, environment variable validation, structured logging, CORS, and application error handling.
 
 ## Tech Stack
 
@@ -60,16 +60,17 @@ The initial backend exposes a versioned API router with a health endpoint and fo
    uvicorn app.main:app --reload
    ```
 
-   The API resolves configuration from the repository-root `.env` file, so the same local settings are used whether you start it from the repository root or from `apps/api`.
+   The API resolves configuration from the repository-root `.env` file, so the same local settings are used whether you start it from the repository root or from `apps/api`. `LLM_PROVIDER` defaults to `mock`, and local product, appointment, support, conversation, and knowledge data do not require a Supabase connection.
 
 ## Quality Checks
 
 ```bash
 pnpm --filter @medishop/web lint
 pnpm --filter @medishop/web build
-cd apps/api && ruff check app
+cd apps/api && ruff check app tests
+cd apps/api && pytest
 ```
 
 ## Current Scope
 
-This repository intentionally contains only the production-grade skeleton and foundational files. Business logic, Shopify integrations, AI agent workflows, RAG pipelines, appointment booking, and support automation will be implemented in later iterations.
+Backend Batch 1 includes mock/local business logic for product discovery, appointment booking, support ticket creation, and safe agent responses. Shopify integrations, Supabase-backed repositories, real LLM providers, and production RAG pipelines remain future iterations.
