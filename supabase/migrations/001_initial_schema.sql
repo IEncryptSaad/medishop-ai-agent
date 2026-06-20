@@ -151,7 +151,6 @@ create index ix_products_name on public.products(name);
 create index ix_knowledge_documents_status on public.knowledge_documents(status);
 create index ix_knowledge_documents_source_type on public.knowledge_documents(source_type);
 create index ix_knowledge_chunks_document_position on public.knowledge_chunks(document_id, chunk_index);
-create index ix_knowledge_chunks_embedding on public.knowledge_chunks using ivfflat (embedding vector_cosine_ops) with (lists = 100);
 create index ix_appointments_user_id on public.appointments(user_id);
 create index ix_appointments_status_start on public.appointments(status, scheduled_start);
 create index ix_support_tickets_status_priority on public.support_tickets(status, priority);
