@@ -114,7 +114,7 @@ Open `http://localhost:3000`.
 | `API_PORT` | `8000` | API | Local API bind port. Render uses `$PORT`. |
 | `API_CORS_ORIGINS` | `http://localhost:3000` | API | Comma-separated allowed frontend origins. |
 | `LLM_PROVIDER` | `mock` | API | Keep as `mock` for this MVP. |
-| `NEXT_PUBLIC_API_URL` | `http://localhost:8000` | Web | Browser-visible FastAPI base URL. |
+| `NEXT_PUBLIC_API_URL` | `http://localhost:8000` locally | Web | Browser-visible FastAPI base URL. For Vercel deployments, configure this in Vercel Project Settings with the deployed Render backend URL. |
 
 Optional future Supabase variables are documented in `docs/supabase-setup.md`.
 
@@ -145,17 +145,17 @@ pip install --upgrade pip && pip install -e ".[dev]"
 uvicorn app.main:app --host 0.0.0.0 --port $PORT
 ```
 
-6. Confirm `https://your-api.onrender.com/api/v1/health` returns `status: ok`.
+6. Confirm the deployed Render backend health endpoint (`/api/v1/health`) returns `status: ok`.
 
 ### Frontend on Vercel
 
 1. Import the GitHub repository in Vercel.
-2. Use `vercel.json` or configure manually:
+2. Use `vercel.json` for safe build/static configuration or configure manually:
    - Framework: Next.js
    - Install command: `pnpm install --frozen-lockfile`
    - Build command: `pnpm --filter @medishop/web build`
    - Output directory: `apps/web/.next`
-3. Set `NEXT_PUBLIC_API_URL=https://your-api.onrender.com`.
+3. In Vercel Project Settings, add `NEXT_PUBLIC_API_URL` as an Environment Variable and set it to your deployed Render backend URL. Do not commit placeholder production API URLs to `vercel.json` or other tracked files.
 4. Deploy and open `/dashboard`, `/chat`, `/products`, `/appointments`, and `/support`.
 
 ## Demo instructions
