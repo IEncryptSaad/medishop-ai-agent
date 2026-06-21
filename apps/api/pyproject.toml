@@ -5,7 +5,8 @@ description = "FastAPI backend for the MediShop AI Agent MVP."
 requires-python = ">=3.11"
 dependencies = [
   "email-validator>=2.2.0",
-  "fastapi>=0.115.0",
+  "fastapi==0.115.14",
+  "starlette==0.46.2",
   "pydantic-settings>=2.7.0",
   "python-json-logger>=3.2.1",
   "sqlalchemy>=2.0.36",
@@ -13,7 +14,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["httpx>=0.28.0", "pytest>=8.3.0", "ruff>=0.8.4"]
+dev = ["httpx==0.28.1", "pytest==8.4.2", "ruff==0.8.6"]
 
 [tool.ruff]
 line-length = 100
