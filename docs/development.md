@@ -27,6 +27,18 @@ pip install -e ".[dev]"
 uvicorn app.main:app --reload
 ```
 
+
+### Backend dependency compatibility
+
+The backend pins the FastAPI/Starlette/httpx test stack to compatible, production-safe versions:
+
+- FastAPI `0.115.14`
+- Starlette `0.46.2`
+- httpx `0.28.1`
+- pytest `8.4.2`
+
+Keep these versions in sync when upgrading. Starlette's `TestClient` uses httpx internally, so unbounded upgrades can break pytest collection before any tests run.
+
 ## Checks
 
 ```bash
