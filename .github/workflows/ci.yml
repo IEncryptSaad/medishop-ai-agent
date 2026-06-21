@@ -18,6 +18,8 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - name: Frontend API client tests
+        run: pnpm --filter @medishop/web test
       - name: Frontend lint
         run: pnpm --filter @medishop/web lint
       - name: Frontend build
@@ -35,4 +37,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install -e "apps/api[dev]"
       - name: Backend lint
-        run: ruff check apps/api/app
+        run: ruff check apps/api/app apps/api/tests
+      - name: Backend tests and smoke checks
+        run: cd apps/api && pytest -q
