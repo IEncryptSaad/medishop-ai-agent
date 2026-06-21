@@ -10,7 +10,7 @@ export function ChatConsole() {
       id: "welcome",
       role: "assistant",
       content:
-        "Hi, I’m the MediShop demo assistant. Ask about products, appointments, or support workflows.",
+        "Hi, I’m the MediShop AI Agent. Ask about products, appointments, support, or medical information.",
     },
   ]);
   const [input, setInput] = useState("");
@@ -74,7 +74,7 @@ export function ChatConsole() {
                     >
                       <b>{s.title}</b>
                       <br />
-                      {s.source_type}
+                      {s.source_type === "mock" ? "Knowledge base" : s.source_type}
                       {s.score ? ` · ${(s.score * 100).toFixed(0)}% match` : ""}
                     </div>
                   ))}
@@ -103,7 +103,7 @@ export function ChatConsole() {
           </button>
         </form>
         <p className="mt-4 text-xs text-slate-500">
-          Medical disclaimer: this demo provides general product and workflow
+          Medical disclaimer: this assistant provides general product and workflow
           information only and is not medical advice, diagnosis, or treatment.
           For personal health questions, consult a qualified clinician.
         </p>

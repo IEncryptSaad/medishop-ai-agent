@@ -29,7 +29,7 @@ export function DashboardPanel() {
     return (
       <EmptyState
         title="Loading dashboard"
-        description="Preparing demo metrics."
+        description="Preparing dashboard metrics."
       />
     );
   }

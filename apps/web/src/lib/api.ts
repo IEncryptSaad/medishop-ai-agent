@@ -208,7 +208,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     });
   } catch {
     throw new ApiError(
-      "Backend is unavailable; showing demo data instead.",
+      "Backend is unavailable; showing locally available data instead.",
       undefined,
       [],
       true,
@@ -305,11 +305,11 @@ export const api = {
         .slice(0, 2);
       return {
         response:
-          "The backend is currently unavailable, so I am using demo product data. I can still help with safe, non-diagnostic product discovery suggestions.",
+          "The backend is currently unavailable, so I am using locally available product data. I can still help with safe, non-diagnostic product discovery suggestions.",
         conversation_id: sessionId,
         sources: [
           {
-            title: "MediShop demo knowledge base",
+            title: "MediShop knowledge base",
             source_type: "mock",
             score: 0.91,
           },
