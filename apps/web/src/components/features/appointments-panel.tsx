@@ -93,7 +93,7 @@ export function AppointmentsPanel() {
           ) : items.length === 0 ? (
             <EmptyState
               title="No appointments"
-              description="Create the first demo booking."
+              description="Create the first booking."
             />
           ) : (
             items.map((a) => (
