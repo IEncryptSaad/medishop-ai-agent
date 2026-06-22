@@ -1,9 +1,7 @@
-import json
 from functools import lru_cache
 from pathlib import Path
-from typing import Any
 
-from pydantic import Field, field_validator
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
@@ -23,32 +21,24 @@ class Settings(BaseSettings):
     api_host: str = Field(default="0.0.0.0", validation_alias="API_HOST")
     api_port: int = Field(default=8000, validation_alias="API_PORT")
     llm_provider: str = Field(default="mock", validation_alias="LLM_PROVIDER")
-    api_cors_origins: list[str] = Field(
-        default_factory=lambda: ["http://localhost:3000"],
-        validation_alias="API_CORS_ORIGINS",
+
+    # Keep this as a plain string so Pydantic Settings never tries to JSON-parse
+    # Render-provided values before our application can normalize them.
+    api_cors_origins_raw: str = Field(
+        default="http://localhost:3000", validation_alias="API_CORS_ORIGINS"
     )
 
-    @field_validator("api_cors_origins", mode="before")
-    @classmethod
-    def parse_cors_origins(cls, value: Any) -> list[str]:
-        if value is None or value == "":
+    @property
+    def api_cors_origins(self) -> list[str]:
+        raw_value = self.api_cors_origins_raw.strip()
+        if not raw_value:
             return ["http://localhost:3000"]
 
-        if isinstance(value, str):
-            raw = value.strip()
-            try:
-                parsed = json.loads(raw)
-                if isinstance(parsed, list):
-                    value = parsed
-                else:
-                    value = [raw]
-            except json.JSONDecodeError:
-                value = raw.split(",")
-
-        if isinstance(value, list):
-            return [str(origin).strip().rstrip("/") for origin in value if str(origin).strip()]
-
-        return [str(value).strip().rstrip("/")]
+        return [
+            origin.strip().rstrip("/")
+            for origin in raw_value.split(",")
+            if origin.strip()
+        ]
 
 
 @lru_cache
