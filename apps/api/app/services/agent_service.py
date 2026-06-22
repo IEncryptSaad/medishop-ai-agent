@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from collections.abc import Iterable
 from hashlib import sha256
 
@@ -57,63 +58,63 @@ class AgentService:
     @staticmethod
     def classify_intent(message: str) -> str:
         text = message.lower()
+        tokens = set(re.findall(r"\b[\w']+\b", text))
         greeting_tokens = {word.strip(".,?!") for word in text.split()}
         is_greeting = (
             text.strip() in {"hi", "hello", "hey", "help"}
             or text.startswith(("hi ", "hello ", "hey "))
             or "what can you do" in text
         )
-        if any(w in text for w in ["appointment", "book", "schedule", "consult", "pharmacist"]):
+        if tokens & {"appointment", "book", "schedule", "consult", "pharmacist"}:
             return "appointment_booking"
-        if any(
-            w in text
-            for w in [
-                "ticket",
-                "refund",
-                "damaged",
-                "leaked",
-                "late",
-                "missing",
-                "order",
-                "shipping",
-                "support",
-                "delivery",
-                "return",
-            ]
-        ):
+
+        support_tokens = {
+            "ticket",
+            "refund",
+            "damaged",
+            "leaked",
+            "missing",
+            "order",
+            "shipping",
+            "support",
+            "delivery",
+            "return",
+        }
+        late_context_tokens = {"delivery", "order", "package", "shipment", "shipping"}
+        is_late_support_issue = "late" in tokens and bool(tokens & late_context_tokens)
+        is_delayed_shipment_issue = bool(tokens & {"delayed", "delay"}) and bool(
+            tokens & {"shipment", "shipping", "delivery", "order", "package"}
+        )
+        if tokens & support_tokens or is_late_support_issue or is_delayed_shipment_issue:
             return "support_request"
-        if any(
-            w in text
-            for w in [
-                "symptom",
-                "diagnose",
-                "medication",
-                "medicine",
-                "dose",
-                "pain",
-                "fever",
-                "cold",
-                "cough",
-                "rash",
-                "allergy",
-                "emergency",
-            ]
-        ):
+
+        if tokens & {
+            "symptom",
+            "diagnose",
+            "medication",
+            "medicine",
+            "dose",
+            "pain",
+            "fever",
+            "cold",
+            "cough",
+            "rash",
+            "allergy",
+            "emergency",
+            "nausea",
+        }:
             return "medical_faq"
-        if any(
-            w in text
-            for w in [
-                "product",
-                "recommend",
-                "moisturizer",
-                "sunscreen",
-                "spray",
-                "skin",
-                "spf",
-                "ceramide",
-                "saline",
-            ]
-        ):
+        if tokens & {
+            "product",
+            "recommend",
+            "moisturizer",
+            "sunscreen",
+            "spray",
+            "skin",
+            "spf",
+            "ceramide",
+            "saline",
+        }:
             return "product_question"
         if is_greeting or greeting_tokens & {"help"}:
             return "greeting_help"

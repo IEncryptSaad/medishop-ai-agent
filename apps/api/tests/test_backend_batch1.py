@@ -1,4 +1,6 @@
+import pytest
 from app.main import create_app
+from app.services.agent_service import AgentService
 from fastapi.testclient import TestClient
 
 client = TestClient(create_app())
@@ -150,6 +152,25 @@ def test_appointment_patch_explicit_null_for_required_fields_is_rejected() -> No
         body = response.json()
         assert body["success"] is False
         assert body["error"] == "validation_error"
+
+
+@pytest.mark.parametrize(
+    ("message", "expected_intent"),
+    [
+        ("fever late at night", "medical_faq"),
+        ("chocolate", "general"),
+        ("nausea late evening", "medical_faq"),
+        ("late delivery", "support_request"),
+        ("delivery is late", "support_request"),
+        ("order is late", "support_request"),
+        ("package arrived late", "support_request"),
+        ("delayed shipment", "support_request"),
+    ],
+)
+def test_agent_intent_uses_word_boundaries_for_late_support_context(
+    message: str, expected_intent: str
+) -> None:
+    assert AgentService.classify_intent(message) == expected_intent
 
 
 def test_agent_chat_appointment_booking_intent() -> None:
