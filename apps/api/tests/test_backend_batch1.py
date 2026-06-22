@@ -150,3 +150,62 @@ def test_appointment_patch_explicit_null_for_required_fields_is_rejected() -> No
         body = response.json()
         assert body["success"] is False
         assert body["error"] == "validation_error"
+
+
+def test_agent_chat_appointment_booking_intent() -> None:
+    response = client.post(
+        "/api/v1/agent/chat",
+        json={
+            "session_id": "test-appointment-agent",
+            "message": "Can you help me schedule a pharmacist consultation next week?",
+        },
+    )
+    assert response.status_code == 200
+    data = response.json()["data"]
+    text = data["response"].lower()
+    assert "appointment" in text or "booking" in text or "consultation" in text
+    assert "date/time" in text or "preferred" in text
+    assert data["recommendations"] == []
+
+
+def test_agent_chat_support_order_issue_intent() -> None:
+    response = client.post(
+        "/api/v1/agent/chat",
+        json={
+            "session_id": "test-support-agent",
+            "message": "My order arrived damaged and the moisturizer leaked during shipping.",
+        },
+    )
+    assert response.status_code == 200
+    text = response.json()["data"]["response"].lower()
+    assert "support" in text or "ticket" in text
+    assert "order" in text
+    assert "refund" in text or "replacement" in text or "status update" in text
+
+
+def test_agent_chat_greeting_help_intent_lists_capabilities() -> None:
+    response = client.post(
+        "/api/v1/agent/chat",
+        json={"session_id": "test-greeting-agent", "message": "Hello, what can you do?"},
+    )
+    assert response.status_code == 200
+    text = response.json()["data"]["response"].lower()
+    assert "product recommendations" in text
+    assert "appointment" in text
+    assert "support" in text
+
+
+def test_agent_chat_medical_response_includes_sources_and_safe_language() -> None:
+    response = client.post(
+        "/api/v1/agent/chat",
+        json={
+            "session_id": "test-medical-rich-agent",
+            "message": "Can saline spray help with cold symptoms?",
+        },
+    )
+    assert response.status_code == 200
+    data = response.json()["data"]
+    text = data["response"].lower()
+    assert "cannot diagnose" in text or "non-diagnostic" in text or "not a diagnosis" in text
+    assert "knowledge-base" in text or data["sources"]
+    assert any(rec["type"] == "product" for rec in data["recommendations"])
